@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <iostream>
 using namespace std;
 
 // Define a shared buffer accessible by all functions and threads
