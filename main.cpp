@@ -1,5 +1,7 @@
+#include <cstdlib>
 #include <pthread.h>
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 // Define a shared buffer accessible by all functions and threads
@@ -20,7 +22,32 @@ int removeItem(bufferItem *item) {
 	return 0;
 }
 
-int main() {
+// Return the given string argument as an integer
+int getIntArg(char* strArg, const char* argLabel) {
+	if (!strArg) {
+		cerr << "Missing argument for " << argLabel << endl;
+		exit(1);
+	}
+	// Read string argument into stream and then read stream into integer to
+	// perform conversion
+	istringstream stream(strArg);
+	int intArg;
+	if (stream >> intArg) {
+		return intArg;
+	} else {
+		cerr << "Invalid " << argLabel << ": " << strArg << endl;
+		exit(1);
+	}
+}
+
+int main(int argc, char *argv[]) {
+
+	// How long to sleep before terminating
+	int sleepTime = getIntArg(argv[1], "sleep time");
+	// The number of producer threads
+	int numProducers = getIntArg(argv[2], "# of producers");
+	// The number of consumer threads
+	int numConsumers = getIntArg(argv[3], "# of consumers");
 
 	return 0;
 
