@@ -65,10 +65,8 @@ int getIntArg(char* strArg, const char* argLabel) {
 void createProducers(int numProducers) {
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
-	srand(time(NULL));
 	for (int i = 0; i < numProducers; i++) {
 		pthread_t tid;
-		bufferItem x = 3;
 		pthread_create(&tid, &attr, produce, NULL);
 	}
 }
