@@ -1,6 +1,6 @@
 #include <cstdlib>
-#include <pthread.h>
 #include <iostream>
+#include <pthread.h>
 #include <sstream>
 #include <unistd.h>
 #include "buffer.h"
