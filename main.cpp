@@ -48,6 +48,11 @@ int main(int argc, char *argv[]) {
 	// The number of consumer threads
 	int numConsumers = getIntArg(argv[3], "# of consumers");
 
+	// Display entered program input for convenience
+	cout << "sleep time: " << sleepTime << "s" << endl;
+	cout << "# producers: " << numProducers << endl;
+	cout << "# consumers: " << numConsumers << endl;
+
 	return 0;
 
 }
