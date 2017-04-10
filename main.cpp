@@ -2,23 +2,46 @@
 #include <pthread.h>
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 #include "buffer.h"
 using namespace std;
 
 // Initialize a buffer shared between all functions and threads
 Buffer buffer;
+// The maximum number a seconds a producer/consumer thread can sleep before it
+// must execute
+int THREAD_MAX_SLEEP_TIME = 3;
 
 // Insert an item into the buffer, returning 0 on success and -1 on failure
-int insertItem(bufferItem item) {
-	// TODO: write insertion logic
-	return 0;
+void* produce(void *ptr) {
+	srand(time(NULL));
+	while (true) {
+		sleep(rand() % THREAD_MAX_SLEEP_TIME);
+		bufferItem item = rand() % 100;
+		int insertStatus = buffer.insertItem(item);
+		// If the buffer is not full
+		if (insertStatus == 0) {
+			cout << "produce " << item << endl;
+		}
+	}
+	pthread_exit(0);
 }
 
 // Remove an item from the buffer and place it into the given item pointer,
 // returning 0 on success and -1 on failure
-int removeItem(bufferItem *item) {
-	// TODO: write removal logic
-	return 0;
+void* consume(void *ptr) {
+	srand(time(NULL));
+	while (true) {
+		sleep(rand() % THREAD_MAX_SLEEP_TIME);
+		bufferItem *item;
+		int removeStatus = buffer.removeItem(item);
+		// If the buffer is not empty
+		if (removeStatus == 0) {
+			cout << "consume " << (*item) << endl;
+			delete item;
+		}
+	}
+	pthread_exit(0);
 }
 
 // Return the given string argument as an integer
@@ -39,6 +62,26 @@ int getIntArg(char* strArg, const char* argLabel) {
 	}
 }
 
+void createProducers(int numProducers) {
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	srand(time(NULL));
+	for (int i = 0; i < numProducers; i++) {
+		pthread_t tid;
+		bufferItem x = 3;
+		pthread_create(&tid, &attr, produce, NULL);
+	}
+}
+
+void createConsumers(int numConsumers) {
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	for (int i = 0; i < numConsumers; i++) {
+		pthread_t tid;
+		pthread_create(&tid, &attr, consume, NULL);
+	}
+}
+
 int main(int argc, char *argv[]) {
 
 	// How long to sleep before terminating
@@ -53,6 +96,13 @@ int main(int argc, char *argv[]) {
 	cout << "# producers: " << numProducers << endl;
 	cout << "# consumers: " << numConsumers << endl;
 
+	createProducers(numProducers);
+	createConsumers(numConsumers);
+
+	// Sleep for the given amount of time before terminating the program
+	sleep(sleepTime);
+	cout << "terminate" << endl;
+	// When main() terminates, any created child threads automatically terminate
 	return 0;
 
 }

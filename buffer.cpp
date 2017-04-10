@@ -12,23 +12,25 @@ Buffer::Buffer() {
 	count = 0;
 }
 
-void Buffer::insert(bufferItem item) {
+int Buffer::insertItem(bufferItem item) {
 	if (count < BUFFER_MAX_SIZE) {
 		rear = (rear + 1) % BUFFER_MAX_SIZE;
 		buffer[rear] = item;
 		count += 1;
+		return 0;
+	} else {
+		return -1;
 	}
 }
 
-bufferItem* Buffer::remove() {
+int Buffer::removeItem(bufferItem *item) {
 	if (count > 0) {
-		bufferItem* item;
 		*item = buffer[front];
 		front = (front + 1) % BUFFER_MAX_SIZE;
 		count -= 1;
-		return item;
+		return 0;
 	} else {
-		return NULL;
+		return -1;
 	}
 }
 

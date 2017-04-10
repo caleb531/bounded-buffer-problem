@@ -22,9 +22,9 @@ class Buffer {
 		// Initialize shared buffer
 		Buffer();
 		// Insert the given item into the buffer
-		void insert(bufferItem item);
+		int insertItem(bufferItem item);
 		// Remove an item from the buffer and return it
-		bufferItem* remove();
+		int removeItem(bufferItem*);
 		// Print the entire buffer to stdout
 		void print();
 
