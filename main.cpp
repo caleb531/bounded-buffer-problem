@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <pthread.h>
+#include <semaphore.h>
 #include <sstream>
 #include <unistd.h>
 #include "buffer.h"
@@ -12,17 +13,30 @@ Buffer buffer;
 // must execute
 int THREAD_MAX_SLEEP_TIME = 3;
 
+// Initialize semaphores shared between producer and consumer
+sem_t *semMutex = sem_open("mutex", O_CREAT, O_RDWR, 1);
+sem_t *semFull = sem_open("full", O_CREAT, O_RDWR, 0);
+sem_t *semEmpty = sem_open("empty", O_CREAT, O_RDWR, BUFFER_MAX_SIZE);
+
 // Insert an item into the buffer, returning 0 on success and -1 on failure
 void* produce(void *ptr) {
 	srand(time(NULL));
 	while (true) {
 		sleep(rand() % THREAD_MAX_SLEEP_TIME);
+
+		sem_wait(semEmpty);
+		sem_wait(semMutex);
+
 		bufferItem item = rand() % 100;
 		int insertStatus = buffer.insertItem(item);
 		// If the buffer is not full
 		if (insertStatus == 0) {
 			cout << "produce " << item << endl;
 		}
+
+		sem_post(semMutex);
+		sem_post(semFull);
+
 	}
 	pthread_exit(0);
 }
@@ -33,6 +47,10 @@ void* consume(void *ptr) {
 	srand(time(NULL));
 	while (true) {
 		sleep(rand() % THREAD_MAX_SLEEP_TIME);
+
+		sem_wait(semFull);
+		sem_wait(semMutex);
+
 		bufferItem *item;
 		int removeStatus = buffer.removeItem(item);
 		// If the buffer is not empty
@@ -40,6 +58,10 @@ void* consume(void *ptr) {
 			cout << "consume " << (*item) << endl;
 			delete item;
 		}
+
+		sem_post(semMutex);
+		sem_post(semEmpty);
+
 	}
 	pthread_exit(0);
 }
