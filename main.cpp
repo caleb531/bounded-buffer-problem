@@ -2,12 +2,11 @@
 #include <pthread.h>
 #include <iostream>
 #include <sstream>
+#include "buffer.h"
 using namespace std;
 
-// Define a shared buffer accessible by all functions and threads
-typedef int bufferItem;
-static const int BUFFER_SIZE = 5;
-bufferItem buffer[BUFFER_SIZE];
+// Initialize a buffer shared between all functions and threads
+Buffer buffer;
 
 // Insert an item into the buffer, returning 0 on success and -1 on failure
 int insertItem(bufferItem item) {
