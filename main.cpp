@@ -11,7 +11,7 @@ using namespace std;
 Buffer buffer;
 // The maximum number a seconds a producer/consumer thread can sleep before it
 // must execute
-int THREAD_MAX_SLEEP_TIME = 3;
+int THREAD_MAX_SLEEP_TIME = 5;
 
 // Initialize semaphores shared between producer and consumer
 sem_t *semMutex = sem_open("mutex", O_CREAT, O_RDWR, 1);
@@ -22,7 +22,7 @@ sem_t *semEmpty = sem_open("empty", O_CREAT, O_RDWR, BUFFER_MAX_SIZE);
 void* produce(void *ptr) {
 	srand(time(NULL));
 	while (true) {
-		sleep(rand() % THREAD_MAX_SLEEP_TIME);
+		sleep(rand() % THREAD_MAX_SLEEP_TIME + 1);
 
 		sem_wait(semEmpty);
 		sem_wait(semMutex);
@@ -46,7 +46,7 @@ void* produce(void *ptr) {
 void* consume(void *ptr) {
 	srand(time(NULL));
 	while (true) {
-		sleep(rand() % THREAD_MAX_SLEEP_TIME);
+		sleep(rand() % THREAD_MAX_SLEEP_TIME + 1);
 
 		sem_wait(semFull);
 		sem_wait(semMutex);
