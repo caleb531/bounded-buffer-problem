@@ -1,3 +1,17 @@
+/**
+ * CS 433 Programming Assignment 4: Producer/Consumer Problem
+ * Caleb Evans, Jonathan Tapia
+ * April 19, 2017
+ * @description
+ * This program is a simulation of the producer/consumer (or bounded buffer)
+ * problem using semaphores to ensure synchronization
+ * @howToRun
+ * Run `make` to compile the program, then execute the compiled program by
+ * running `./bpp.out` with three arguments. The first argument is the number of
+ * seconds the program will sleep before timing out and terminating. The second
+ * argument is the number of producer threads to create. The third and final
+ * argument is the number of consumer threads to create.
+ */
 // Suppress the pesky "sem_init() is deprecated" warnings on macOS
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
