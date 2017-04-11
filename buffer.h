@@ -23,8 +23,8 @@ class Buffer {
 		Buffer();
 		// Insert the given item into the buffer
 		int insertItem(bufferItem item);
-		// Remove an item from the buffer and return it
-		int removeItem(bufferItem*);
+		// Remove an item from the buffer and store it into the given variable
+		int removeItem(bufferItem&);
 		// Print the entire buffer to stdout
 		void print();
 

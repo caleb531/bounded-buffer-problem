@@ -23,9 +23,9 @@ int Buffer::insertItem(bufferItem item) {
 	}
 }
 
-int Buffer::removeItem(bufferItem *item) {
+int Buffer::removeItem(bufferItem& item) {
 	if (count > 0) {
-		*item = buffer[front];
+		item = buffer[front];
 		front = (front + 1) % BUFFER_MAX_SIZE;
 		count -= 1;
 		return 0;

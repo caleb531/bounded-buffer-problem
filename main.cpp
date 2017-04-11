@@ -14,7 +14,7 @@ using namespace std;
 Buffer buffer;
 // The maximum number a seconds a producer/consumer thread can sleep before it
 // must execute
-int THREAD_MAX_SLEEP_TIME = 5;
+int THREAD_MAX_SLEEP_TIME = 3;
 
 // Declare semaphores shared between producer and consumer
 sem_t *semMutex;
@@ -54,12 +54,11 @@ void* consume(void *ptr) {
 		sem_wait(semFull);
 		sem_wait(semMutex);
 
-		bufferItem *item;
+		bufferItem item;
 		int removeStatus = buffer.removeItem(item);
 		// If the buffer is not empty
 		if (removeStatus == 0) {
-			cout << "consume " << (*item) << endl;
-			delete item;
+			cout << "consume " << item << endl;
 		}
 
 		sem_post(semMutex);
