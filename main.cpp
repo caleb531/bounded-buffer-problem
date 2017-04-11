@@ -35,9 +35,14 @@ const int S_TO_MS = 1000;
 const int MS_TO_US = 1000;
 
 // Declare semaphores shared between producer and consumer
-sem_t semMutex;
-sem_t semFull;
-sem_t semEmpty;
+
+// bufNotInUse ensures that the buffer is never being used by two or more //
+// threads at the same time
+sem_t bufNotInUse;
+// bufNotEmpty prevents the consumer from consuming if the buffer is empty
+sem_t bufNotEmpty;
+// bufNotFull prevents the producer from producing if the buffer is full
+sem_t bufNotFull;
 
 // Sleep for a random number of milliseconds
 void sleepRandomTime() {
@@ -49,8 +54,10 @@ void* produce(void *ptr) {
 	while (true) {
 		sleepRandomTime();
 
-		sem_wait(&semEmpty);
-		sem_wait(&semMutex);
+		// Wait until the buffer is no longer full
+		sem_wait(&bufNotFull);
+		// Wait until the buffer is no longer in use
+		sem_wait(&bufNotInUse);
 
 		bufferItem item = rand() % 100;
 		int insertStatus = buffer.insertItem(item);
@@ -68,8 +75,10 @@ void* produce(void *ptr) {
 			cout << ss.str();
 		}
 
-		sem_post(&semMutex);
-		sem_post(&semFull);
+		// Signify that the buffer is no longer in use
+		sem_post(&bufNotInUse);
+		// Signify that the buffer is definitely not empty at this point
+		sem_post(&bufNotEmpty);
 
 	}
 	pthread_exit(0);
@@ -81,8 +90,10 @@ void* consume(void *ptr) {
 	while (true) {
 		sleepRandomTime();
 
-		sem_wait(&semFull);
-		sem_wait(&semMutex);
+		// Wait until there is an item to consume
+		sem_wait(&bufNotEmpty);
+		// Wait until the buffer is no longer in use
+		sem_wait(&bufNotInUse);
 
 		bufferItem item;
 		int removeStatus = buffer.removeItem(item);
@@ -93,8 +104,11 @@ void* consume(void *ptr) {
 			cout << ss.str();
 		}
 
-		sem_post(&semMutex);
-		sem_post(&semEmpty);
+
+		// Signify that the buffer is no longer in use
+		sem_post(&bufNotInUse);
+		// Signify that the buffer is definitely not full at this point
+		sem_post(&bufNotFull);
 
 	}
 	pthread_exit(0);
@@ -138,15 +152,15 @@ void createConsumers(int numConsumers) {
 
 void initializeSemaphores() {
 	int pshared = 0;
-	sem_init(&semMutex, pshared, 1);
-	sem_init(&semFull, pshared, 0);
-	sem_init(&semEmpty, pshared, BUFFER_MAX_SIZE);
+	sem_init(&bufNotInUse, pshared, 1);
+	sem_init(&bufNotEmpty, pshared, 0);
+	sem_init(&bufNotFull, pshared, BUFFER_MAX_SIZE);
 }
 
 void destroySemaphores() {
-	sem_destroy(&semMutex);
-	sem_destroy(&semFull);
-	sem_destroy(&semEmpty);
+	sem_destroy(&bufNotInUse);
+	sem_destroy(&bufNotEmpty);
+	sem_destroy(&bufNotFull);
 }
 
 int main(int argc, char *argv[]) {
