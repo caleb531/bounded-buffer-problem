@@ -102,7 +102,6 @@ void* consume(void *ptr) {
 			cout << ss.str();
 		}
 
-
 		// Signify that the buffer is no longer in use
 		sem_post(&bufNotInUse);
 		// Signify that the buffer is definitely not full at this point
