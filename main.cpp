@@ -36,12 +36,14 @@ const int MS_TO_US = 1000;
 
 // Declare semaphores shared between producer and consumer
 
-// bufNotInUse ensures that the buffer is never being used by two or more //
-// threads at the same time
+// bufNotInUse ensures that the buffer is never being used by two or more
+// threads at the same time (this is equivalent to the "mutex" lock)
 pthread_mutex_t bufNotInUse;
-// bufNotEmpty prevents the consumer from consuming if the buffer is empty
+// bufNotEmpty prevents the consumer from consuming if the buffer is empty (this
+// is equivalent to the "full" semaphore)
 sem_t bufNotEmpty;
-// bufNotFull prevents the producer from producing if the buffer is full
+// bufNotFull prevents the producer from producing if the buffer is full (this
+// is equivalent to the "empty" semaphore)
 sem_t bufNotFull;
 
 // Sleep for a random number of milliseconds
