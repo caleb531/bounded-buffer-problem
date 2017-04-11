@@ -111,6 +111,12 @@ void initializeSemaphores() {
 	sem_init(&semEmpty, pshared, BUFFER_MAX_SIZE);
 }
 
+void destroySemaphores() {
+	sem_destroy(&semMutex);
+	sem_destroy(&semFull);
+	sem_destroy(&semEmpty);
+}
+
 int main(int argc, char *argv[]) {
 
 	// How long to sleep before terminating
@@ -131,6 +137,8 @@ int main(int argc, char *argv[]) {
 
 	// Sleep for the given amount of time before terminating the program
 	sleep(sleepTime);
+
+	destroySemaphores();
 	cout << "terminate" << endl;
 	// When main() terminates, any created child threads automatically terminate
 	return 0;
