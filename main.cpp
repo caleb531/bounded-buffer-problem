@@ -63,12 +63,10 @@ void* produce(void *ptr) {
 		int insertStatus = buffer.insertItem(item);
 		// If the buffer is not full
 		if (insertStatus == 0) {
-			// Write the output to a separate stream and then cout the stream as
-			// one large string so as to avoid any synchronization issues with
-			// cout; even with the mutex lock/semaphore in place, the data may
-			// still be written to stdout after the lock is released, rendering
-			// the semaphore insufficient for making cout completely thread-safe
-			// (this has been confirmed by our own testing); see
+			// Even with the semaphores in place, cout will stil experience
+			// synchronization issues if multiple items are cout'ed in sequence;
+			// to solve this, write the output to a separate string, then cout
+			// the stream as one large string; see
 			// <http://stackoverflow.com/a/26909227/560642>
 			ostringstream ss;
 			ss << "produce " << item << " => " << buffer.str() << endl;
