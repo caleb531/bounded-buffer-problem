@@ -1,3 +1,6 @@
+// Suppress the pesky "sem_init() is deprecated" warnings on macOS
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <cstdlib>
 #include <iostream>
 #include <pthread.h>
@@ -13,10 +16,10 @@ Buffer buffer;
 // must execute
 int THREAD_MAX_SLEEP_TIME = 5;
 
-// Initialize semaphores shared between producer and consumer
-sem_t *semMutex = sem_open("mutex", O_CREAT, O_RDWR, 1);
-sem_t *semFull = sem_open("full", O_CREAT, O_RDWR, 0);
-sem_t *semEmpty = sem_open("empty", O_CREAT, O_RDWR, BUFFER_MAX_SIZE);
+// Declare semaphores shared between producer and consumer
+sem_t *semMutex;
+sem_t *semFull;
+sem_t *semEmpty;
 
 // Insert an item into the buffer, returning 0 on success and -1 on failure
 void* produce(void *ptr) {
@@ -102,6 +105,13 @@ void createConsumers(int numConsumers) {
 	}
 }
 
+void initializeSemaphores() {
+	int pshared = 0;
+	sem_init(semMutex, pshared, 1);
+	sem_init(semFull, pshared, 0);
+	sem_init(semEmpty, pshared, BUFFER_MAX_SIZE);
+}
+
 int main(int argc, char *argv[]) {
 
 	// How long to sleep before terminating
@@ -116,6 +126,7 @@ int main(int argc, char *argv[]) {
 	cout << "# producers: " << numProducers << endl;
 	cout << "# consumers: " << numConsumers << endl;
 
+	initializeSemaphores();
 	createProducers(numProducers);
 	createConsumers(numConsumers);
 
@@ -126,3 +137,4 @@ int main(int argc, char *argv[]) {
 	return 0;
 
 }
+#pragma GCC diagnostic pop
