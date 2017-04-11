@@ -17,9 +17,9 @@ Buffer buffer;
 int THREAD_MAX_SLEEP_TIME = 3;
 
 // Declare semaphores shared between producer and consumer
-sem_t *semMutex;
-sem_t *semFull;
-sem_t *semEmpty;
+sem_t semMutex;
+sem_t semFull;
+sem_t semEmpty;
 
 // Insert an item into the buffer, returning 0 on success and -1 on failure
 void* produce(void *ptr) {
@@ -27,8 +27,8 @@ void* produce(void *ptr) {
 	while (true) {
 		sleep(rand() % THREAD_MAX_SLEEP_TIME + 1);
 
-		sem_wait(semEmpty);
-		sem_wait(semMutex);
+		sem_wait(&semEmpty);
+		sem_wait(&semMutex);
 
 		bufferItem item = rand() % 100;
 		int insertStatus = buffer.insertItem(item);
@@ -37,8 +37,8 @@ void* produce(void *ptr) {
 			cout << "produce " << item << endl;
 		}
 
-		sem_post(semMutex);
-		sem_post(semFull);
+		sem_post(&semMutex);
+		sem_post(&semFull);
 
 	}
 	pthread_exit(0);
@@ -51,8 +51,8 @@ void* consume(void *ptr) {
 	while (true) {
 		sleep(rand() % THREAD_MAX_SLEEP_TIME + 1);
 
-		sem_wait(semFull);
-		sem_wait(semMutex);
+		sem_wait(&semFull);
+		sem_wait(&semMutex);
 
 		bufferItem item;
 		int removeStatus = buffer.removeItem(item);
@@ -61,8 +61,8 @@ void* consume(void *ptr) {
 			cout << "consume " << item << endl;
 		}
 
-		sem_post(semMutex);
-		sem_post(semEmpty);
+		sem_post(&semMutex);
+		sem_post(&semEmpty);
 
 	}
 	pthread_exit(0);
@@ -106,9 +106,9 @@ void createConsumers(int numConsumers) {
 
 void initializeSemaphores() {
 	int pshared = 0;
-	sem_init(semMutex, pshared, 1);
-	sem_init(semFull, pshared, 0);
-	sem_init(semEmpty, pshared, BUFFER_MAX_SIZE);
+	sem_init(&semMutex, pshared, 1);
+	sem_init(&semFull, pshared, 0);
+	sem_init(&semEmpty, pshared, BUFFER_MAX_SIZE);
 }
 
 int main(int argc, char *argv[]) {
