@@ -32,6 +32,4 @@ class Buffer {
 		// the STL stringstream method of the same name
 		string str();
 
-
-
 };
