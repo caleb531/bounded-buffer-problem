@@ -71,7 +71,7 @@ void* produce(void *ptr) {
 			// (this has been confirmed by our own testing); see
 			// <http://stackoverflow.com/a/26909227/560642>
 			ostringstream ss;
-			ss << "produce " << item << "; buffer = " << buffer.str() << endl;
+			ss << "produce " << item << " => " << buffer.str() << endl;
 			cout << ss.str();
 		}
 
@@ -100,7 +100,7 @@ void* consume(void *ptr) {
 		// If the buffer is not empty
 		if (removeStatus == 0) {
 			ostringstream ss;
-			ss << "consume " << item << "; buffer = " << buffer.str() << endl;
+			ss << "consume " << item << " => " << buffer.str() << endl;
 			cout << ss.str();
 		}
 
