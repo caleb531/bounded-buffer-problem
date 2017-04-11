@@ -1,6 +1,8 @@
 /**
  * Shared buffer definition
  */
+#include <string>
+using namespace std;
 
 // Define a shared buffer accessible by all functions and threads
 typedef int bufferItem;
@@ -25,8 +27,10 @@ class Buffer {
 		int insertItem(bufferItem item);
 		// Remove an item from the buffer and store it into the given variable
 		int removeItem(bufferItem&);
-		// Print the entire buffer to stdout
-		void print();
+		// Return a human-readable string representing the current state of the
+		// buffer; this method is named str() for the sake of consistency with
+		// the STL stringstream method of the same name
+		string str();
 
 
 

@@ -3,6 +3,8 @@
  */
 
 #include <iostream>
+#include <sstream>
+#include <string>
 #include "buffer.h"
 using namespace std;
 
@@ -34,10 +36,16 @@ int Buffer::removeItem(bufferItem& item) {
 	}
 }
 
-void Buffer::print() {
-	cout << "[ ";
-	for (int i = 0; i < count; i++) {
-		cout << buffer[i] << ' ';
+string Buffer::str() {
+	ostringstream ss;
+	ss << "[";
+	// Every item in the buffer except the last should be followed by a comma
+	for (int i = front; i != rear; i = (i + 1) % BUFFER_MAX_SIZE) {
+		ss << buffer[i] << ", ";
 	}
-	cout << "]";
+	if (count > 0) {
+		ss << buffer[rear];
+	}
+	ss << "]";
+	return ss.str();
 }
