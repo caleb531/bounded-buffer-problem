@@ -38,14 +38,16 @@ int Buffer::removeItem(bufferItem& item) {
 
 string Buffer::str() {
 	ostringstream ss;
-	ss << "[";
-	// Every item in the buffer except the last should be followed by a comma
-	for (int i = front; i != rear; i = (i + 1) % BUFFER_MAX_SIZE) {
-		ss << buffer[i] << ", ";
-	}
-	if (count > 0) {
+	if (count == 0) {
+		ss << "[]";
+	} else {
+		ss << "[";
+		// Every item in the buffer except the last should be followed by a comma
+		for (int i = front; i != rear; i = (i + 1) % BUFFER_MAX_SIZE) {
+			ss << buffer[i] << ", ";
+		}
 		ss << buffer[rear];
+		ss << "]";
 	}
-	ss << "]";
 	return ss.str();
 }
