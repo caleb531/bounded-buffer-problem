@@ -38,7 +38,7 @@ const int MS_TO_US = 1000;
 
 // bufNotInUse ensures that the buffer is never being used by two or more //
 // threads at the same time
-sem_t bufNotInUse;
+pthread_mutex_t bufNotInUse;
 // bufNotEmpty prevents the consumer from consuming if the buffer is empty
 sem_t bufNotEmpty;
 // bufNotFull prevents the producer from producing if the buffer is full
@@ -57,7 +57,7 @@ void* produce(void *ptr) {
 		// Wait until the buffer is no longer full
 		sem_wait(&bufNotFull);
 		// Wait until the buffer is no longer in use
-		sem_wait(&bufNotInUse);
+		pthread_mutex_lock(&bufNotInUse);
 
 		bufferItem item = rand() % 100;
 		int insertStatus = buffer.insertItem(item);
@@ -74,7 +74,7 @@ void* produce(void *ptr) {
 		}
 
 		// Signify that the buffer is no longer in use
-		sem_post(&bufNotInUse);
+		pthread_mutex_unlock(&bufNotInUse);
 		// Signify that the buffer is definitely not empty at this point
 		sem_post(&bufNotEmpty);
 
@@ -91,7 +91,7 @@ void* consume(void *ptr) {
 		// Wait until there is an item to consume
 		sem_wait(&bufNotEmpty);
 		// Wait until the buffer is no longer in use
-		sem_wait(&bufNotInUse);
+		pthread_mutex_lock(&bufNotInUse);
 
 		bufferItem item;
 		int removeStatus = buffer.removeItem(item);
@@ -103,7 +103,7 @@ void* consume(void *ptr) {
 		}
 
 		// Signify that the buffer is no longer in use
-		sem_post(&bufNotInUse);
+		pthread_mutex_unlock(&bufNotInUse);
 		// Signify that the buffer is definitely not full at this point
 		sem_post(&bufNotFull);
 
@@ -147,15 +147,19 @@ void createConsumers(int numConsumers) {
 	}
 }
 
-void initializeSemaphores() {
+// Initialize the program's mutex locks and semaphores (semaphores count as
+// locks, don't they?)
+void initializeLocks() {
 	int pshared = 0;
-	sem_init(&bufNotInUse, pshared, 1);
+	pthread_mutexattr_t attr;
+	pthread_mutex_init(&bufNotInUse, &attr);
 	sem_init(&bufNotEmpty, pshared, 0);
 	sem_init(&bufNotFull, pshared, BUFFER_MAX_SIZE);
 }
 
-void destroySemaphores() {
-	sem_destroy(&bufNotInUse);
+// Destroy the program's mutex locks and semaphores
+void destroyLocks() {
+	pthread_mutex_destroy(&bufNotInUse);
 	sem_destroy(&bufNotEmpty);
 	sem_destroy(&bufNotFull);
 }
@@ -177,14 +181,14 @@ int main(int argc, char *argv[]) {
 	cout << "# producers: " << numProducers << endl;
 	cout << "# consumers: " << numConsumers << endl;
 
-	initializeSemaphores();
+	initializeLocks();
 	createProducers(numProducers);
 	createConsumers(numConsumers);
 
 	// Sleep for the given amount of time before terminating the program
 	sleep(sleepTime);
 
-	destroySemaphores();
+	destroyLocks();
 	cout << "terminate" << endl;
 	// When main() terminates, any created child threads automatically terminate
 	return 0;
