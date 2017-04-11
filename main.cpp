@@ -15,17 +15,25 @@ Buffer buffer;
 // The maximum number a seconds a producer/consumer thread can sleep before it
 // must execute
 int THREAD_MAX_SLEEP_TIME = 3;
+// Seconds-to-milliseconds conversion factor
+const int S_TO_MS = 1000;
+// Milliseconds-to-microseconds conversion factor
+const int MS_TO_US = 1000;
 
 // Declare semaphores shared between producer and consumer
 sem_t semMutex;
 sem_t semFull;
 sem_t semEmpty;
 
+// Sleep for a random number of milliseconds
+void sleepRandomTime() {
+	usleep((rand() % (THREAD_MAX_SLEEP_TIME * S_TO_MS)) * MS_TO_US);
+}
+
 // Insert an item into the buffer, returning 0 on success and -1 on failure
 void* produce(void *ptr) {
-	srand(time(NULL));
 	while (true) {
-		sleep(rand() % THREAD_MAX_SLEEP_TIME + 1);
+		sleepRandomTime();
 
 		sem_wait(&semEmpty);
 		sem_wait(&semMutex);
@@ -47,9 +55,8 @@ void* produce(void *ptr) {
 // Remove an item from the buffer and place it into the given item pointer,
 // returning 0 on success and -1 on failure
 void* consume(void *ptr) {
-	srand(time(NULL));
 	while (true) {
-		sleep(rand() % THREAD_MAX_SLEEP_TIME + 1);
+		sleepRandomTime();
 
 		sem_wait(&semFull);
 		sem_wait(&semMutex);
@@ -118,6 +125,9 @@ void destroySemaphores() {
 }
 
 int main(int argc, char *argv[]) {
+
+	// Seed random number generator
+	srand(time(NULL));
 
 	// How long to sleep before terminating
 	int sleepTime = getIntArg(argv[1], "sleep time");
