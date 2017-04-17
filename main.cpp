@@ -61,7 +61,7 @@ void* produce(void *ptr) {
 		// Wait until the buffer is no longer in use
 		pthread_mutex_lock(&bufNotInUse);
 
-		bufferItem item = rand() % 100;
+		bufferItem item = rand();
 		int insertStatus = buffer.insertItem(item);
 		// If the buffer is not full
 		if (insertStatus == 0) {
